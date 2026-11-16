@@ -1,0 +1,124 @@
+---
+import Logo from "./Logo.astro";
+import GithubMark from "./GithubMark.astro";
+import { nav, site, startCta } from "../config/site";
+---
+
+<header
+  id="top"
+  class="sticky top-0 z-50 border-b border-transparent bg-white/90 backdrop-blur-md transition-[border-color] duration-200 data-[scrolled=true]:border-line"
+  data-header
+>
+  <div class="wrap flex h-[68px] items-center justify-between gap-6">
+    <a href="#top" class="-m-1 rounded-md p-1" aria-label="MyFinSight 처음으로">
+      <Logo />
+    </a>
+
+    <nav aria-label="주요 메뉴" class="hidden lg:block">
+      <ul class="flex items-center gap-1">
+        {
+          nav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class="rounded-md px-3 py-2 text-[15px] font-medium text-ink-2 transition-colors hover:bg-mist hover:text-ink"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      {
+        site.repoUrl && (
+          <a
+            href={site.repoUrl}
+            rel="noopener"
+            class="hidden h-[42px] items-center gap-2 rounded-md px-3 text-[15px] font-medium text-ink-2 transition-colors hover:bg-mist hover:text-ink sm:inline-flex"
+          >
+            <GithubMark size={18} />
+            GitHub
+          </a>
+        )
+      }
+      <a
+        href={startCta.href}
+        class="btn btn-primary hidden min-h-[42px] px-4 text-[15px] sm:inline-flex"
+        {...startCta.external ? { rel: "noopener" } : {}}
+      >
+        {startCta.label}
+      </a>
+      <button
+        type="button"
+        class="inline-flex h-11 w-11 items-center justify-center rounded-md text-ink hover:bg-mist lg:hidden"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        data-menu-toggle
+      >
+        <span class="sr-only" data-menu-label>메뉴 열기</span>
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M4 7h16M4 12h16M4 17h16" data-icon-open></path>
+          <path d="M6 6l12 12M18 6 6 18" data-icon-close class="hidden"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="hidden border-t border-line bg-white lg:hidden" data-menu>
+    <nav aria-label="모바일 메뉴" class="wrap py-4">
+      <ul class="flex flex-col">
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href} class="flex min-h-12 items-center border-b border-line text-[17px] font-medium" data-menu-link>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <a href={startCta.href} class="btn btn-primary mt-5 w-full" data-menu-link>{startCta.label}</a>
+      {
+        site.repoUrl && (
+          <a href={site.repoUrl} rel="noopener" class="btn btn-secondary mt-3 w-full">
+            <GithubMark size={18} />
+            GitHub 저장소
+          </a>
+        )
+      }
+    </nav>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>("[data-header]");
+  const toggle = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+  const menu = document.querySelector<HTMLElement>("[data-menu]");
+  const label = document.querySelector<HTMLElement>("[data-menu-label]");
+
+  const onScroll = () => header?.setAttribute("data-scrolled", String(window.scrollY > 8));
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  const setOpen = (open: boolean) => {
+    if (!toggle || !menu) return;
+    toggle.setAttribute("aria-expanded", String(open));
+    menu.classList.toggle("hidden", !open);
+    toggle.querySelector("[data-icon-open]")?.classList.toggle("hidden", open);
+    toggle.querySelector("[data-icon-close]")?.classList.toggle("hidden", !open);
+    if (label) label.textContent = open ? "메뉴 닫기" : "메뉴 열기";
+  };
+
+  toggle?.addEventListener("click", () => setOpen(toggle.getAttribute("aria-expanded") !== "true"));
+  menu?.querySelectorAll("[data-menu-link]").forEach((a) => a.addEventListener("click", () => setOpen(false)));
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && toggle?.getAttribute("aria-expanded") === "true") {
+      setOpen(false);
+      toggle.focus();
+    }
+  });
+  window.matchMedia("(min-width: 1024px)").addEventListener("change", (e) => e.matches && setOpen(false));
+</script>

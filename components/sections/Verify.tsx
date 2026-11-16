@@ -1,0 +1,91 @@
+/**
+ * 검증 방식. 근거: m5_backtest_report/validate.py (충족·주의·미충족, 추천/추천(주의)/구성 불충분),
+ * settings.py (commission_bps=5, 비교지수 SPY·QQQ·069500.KS), schemas/request.py (리밸런싱 2w~1y, 월 적립, USDKRW),
+ * m2_data/market_data.py (기준일 전날까지 자료), report_blocks.py:1396 (생존 편향 명시).
+ */
+import { FrameBar } from "../product/AppFrame";
+import { checks, scenario } from "@/lib/example";
+
+const tone = { ok: "text-ok bg-ok-50", warn: "text-warn bg-warn-50", bad: "text-bad bg-bad-50" } as const;
+
+const verdicts = [
+  { label: "추천", body: "투자조건을 모두 충족한 구성입니다." },
+  { label: "추천(주의)", body: "구성은 가능하지만 일부 조건을 넘었습니다. 넘은 항목과 그 의미를 함께 적습니다." },
+  { label: "구성 불충분", body: "조건을 맞추는 구성을 만들 수 없었습니다. 제외 종목이나 상한을 임의로 바꾸지 않고 이유를 설명합니다." },
+];
+
+const spec = [
+  { k: "리밸런싱", v: "2주, 1개월, 분기, 반기, 1년 중 선택. 매월 추가 납입도 반영합니다." },
+  { k: "거래 비용", v: "거래 금액의 0.05%를 매번 뺍니다." },
+  { k: "비교지수", v: "SPY를 기본으로, QQQ를 함께 봅니다. 한국 종목이 있으면 KODEX 200을 더합니다." },
+  { k: "미래 자료 차단", v: "리밸런싱 날의 비중은 전날까지의 자료로 계산하고, 그날 종가로 샀다고 봅니다." },
+  { k: "통화", v: "원화로 투자하면 시작일과 기준일의 원·달러 환율로 환산합니다." },
+  { k: "지표", v: "누적·연평균 수익률, 변동성, 최대낙폭, 샤프·소르티노·칼마 비율, 베타, 정보비율 등" },
+];
+
+export default function Verify() {
+  return (
+    <section id="verify" className="border-t border-line bg-mist py-20 md:py-28" aria-labelledby="verify-title">
+      <div className="wrap">
+        <div className="max-w-[46rem]">
+          <h2 id="verify-title" className="h-section">
+            좋은 결과만 골라 보여 주지 않습니다
+          </h2>
+          <p className="lead mt-5">
+            백테스트가 끝나면 내 투자조건과 결과를 하나씩 대조합니다. 조건을 넘은 항목은 ‘주의’로 표시하고, 조건을 맞출 수
+            없으면 ‘구성 불충분’이라고 알려 줍니다.
+          </p>
+        </div>
+
+        <div className="mt-14 grid gap-10 lg:grid-cols-12">
+          <div className="lg:col-span-6">
+            <div className="frame">
+              <FrameBar title="분석 리포트 · 주의 사항과 전제" />
+              <div className="bg-white p-5 md:p-6">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-[16px] font-bold">내 투자조건 점검</p>
+                  <span className="pill text-[12px] text-warn">{scenario.verdict}</span>
+                </div>
+                <ul className="mt-4 flex flex-col">
+                  {checks.map((c) => (
+                    <li key={c.rule} className="flex items-center justify-between gap-3 border-t border-[#eef2f6] py-3 text-[15px]">
+                      <span>{c.rule}</span>
+                      <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${tone[c.tone]}`}>{c.result}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <h3 className="h-sub mt-10">판단은 세 가지 중 하나로 나옵니다</h3>
+            <dl className="mt-4 flex flex-col">
+              {verdicts.map((v) => (
+                <div key={v.label} className="grid gap-1 border-t border-line py-4 sm:grid-cols-[9rem_1fr] sm:gap-4">
+                  <dt className="font-semibold">{v.label}</dt>
+                  <dd className="text-[16px] leading-relaxed text-ink-2">{v.body}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <div className="lg:col-span-5 lg:col-start-8">
+            <h3 className="h-sub">백테스트는 이렇게 계산합니다</h3>
+            <dl className="mt-4 flex flex-col">
+              {spec.map((s) => (
+                <div key={s.k} className="border-t border-line py-4">
+                  <dt className="text-[15px] font-semibold">{s.k}</dt>
+                  <dd className="mt-1 text-[16px] leading-relaxed text-ink-2">{s.v}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="mt-6 rounded-[10px] border border-line bg-white p-5 text-[15px] leading-relaxed text-ink-2">
+              <b className="font-semibold text-ink">알아 둘 한계.</b> 과거 구간에도 지금의 구성종목을 적용하므로, 그 사이 지수에서
+              빠진 종목은 후보에 없습니다. 그래서 과거 성과가 실제보다 좋게 나올 수 있으며, 리포트의 분석 조건에 이 한계를 함께
+              적습니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

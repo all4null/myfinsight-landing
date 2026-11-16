@@ -1,0 +1,75 @@
+---
+/**
+ * 앱 창 재현 프레임.
+ * - 위 막대: 화면 이름 + "예시 화면" 표시 (실제 결과와 헷갈리지 않게 항상 보인다).
+ * - sidebar: 앱 사이드바(홈 · 새 분석 / 분석 리포트 / 모의투자 / 내 투자조건). 프레임이 넓을 때만 보인다.
+ */
+interface Props {
+  title: string;
+  active?: "home" | "reports" | "paper" | "profile";
+  sidebar?: boolean;
+  class?: string;
+}
+const { title, active = "home", sidebar = true, class: className = "" } = Astro.props;
+
+const menu = [
+  { key: "home", label: "홈 · 새 분석" },
+  { key: "reports", label: "분석 리포트" },
+  { key: "paper", label: "모의투자" },
+  { key: "profile", label: "내 투자조건" },
+] as const;
+---
+
+<div class:list={["frame", className]}>
+  <div class="flex h-9 items-center justify-between gap-3 border-b border-[#e2e8f0] bg-white px-3.5 text-[12px]">
+    <span class="flex items-center gap-2 font-medium text-ink-3">
+      <span class="flex gap-1.5" aria-hidden="true">
+        <span class="h-2 w-2 rounded-full bg-[#dbe2ea]"></span>
+        <span class="h-2 w-2 rounded-full bg-[#dbe2ea]"></span>
+      </span>
+      <span class="truncate">MyFinSight · {title}</span>
+    </span>
+    <span class="shrink-0 rounded-[4px] bg-mist px-1.5 py-0.5 font-semibold text-ink-3">예시 화면</span>
+  </div>
+  <div class="app-body flex min-h-0">
+    {
+      sidebar && (
+        <div class="app-sidebar hidden w-[168px] shrink-0 flex-col gap-1 border-r border-[#e2e8f0] bg-white px-2.5 py-4" aria-hidden="true">
+          <div class="mb-3 flex items-center gap-2 px-1.5">
+            <span class="grid h-6 w-6 place-items-center rounded-[6px] bg-[#1d4ed8]">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                <polyline points="16 7 22 7 22 13" />
+              </svg>
+            </span>
+            <span class="text-[13px] leading-tight font-bold">
+              MyFinSight
+              <span class="block text-[10px] font-medium text-ink-3">개인화 투자전략</span>
+            </span>
+          </div>
+          {menu.map((m) => (
+            <span
+              class:list={[
+                "rounded-lg px-2.5 py-2 text-[12.5px]",
+                m.key === active ? "bg-[#eff6ff] font-semibold text-[#1d4ed8]" : "text-[#334155]",
+              ]}
+            >
+              {m.label}
+            </span>
+          ))}
+        </div>
+      )
+    }
+    <div class="min-w-0 flex-1 [container-type:inline-size]">
+      <slot />
+    </div>
+  </div>
+</div>
+
+<style>
+  @container (min-width: 740px) {
+    .app-sidebar {
+      display: flex;
+    }
+  }
+</style>

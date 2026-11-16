@@ -1,0 +1,166 @@
+---
+/**
+ * 리포트와 인용(근거) 소개. 근거: m5_backtest_report/report_check.py (인용 실존·기준일·보유 종목·금지 표현 검사),
+ * Front report/SectionNav.tsx (섹션 이름), docs/03 9절 (출처 패널 항목).
+ */
+const sections = [
+  "종합 판단",
+  "포트폴리오 구성",
+  "기업별 근거",
+  "시장·뉴스 분석",
+  "과거 성과",
+  "요청 내역",
+  "주의 사항과 전제",
+  "자료와 분석 조건",
+];
+
+const sources = [
+  {
+    id: "1",
+    kind: "공시",
+    title: "실적 발표 (8-K, 항목 2.02)",
+    org: "Applied Materials · SEC EDGAR",
+    date: "접수일 2026-08-14",
+    note: "공시는 사건이 있었다는 사실만 알려 줍니다. 내용 해석은 본문에서 따로 설명합니다.",
+  },
+  {
+    id: "2",
+    kind: "계산값",
+    title: "60거래일 변동성",
+    org: "가격 자료로 계산",
+    date: "기준일 2026-10-30 전날까지",
+    note: "역변동성 비중은 이 값의 역수로 정한 뒤, 종목당 상한 20%를 적용합니다.",
+  },
+];
+---
+
+<section id="report" class="py-20 md:py-28" aria-labelledby="report-title">
+  <div class="wrap grid gap-12 lg:grid-cols-12 lg:gap-10">
+    <div class="lg:col-span-5">
+      <h2 id="report-title" class="h-section">문장마다 출처를 확인할 수 있는 리포트</h2>
+      <p class="lead mt-5">
+        리포트는 결론만 말하지 않습니다. 어떤 기업을 왜 골랐는지, 비중이 어떻게 정해졌는지, 과거에 얼마나
+        떨어졌는지를 문단으로 설명하고, 주요 사실 옆에 번호를 달아 원래 자료로 이어 줍니다.
+      </p>
+
+      <ul class="mt-8 flex flex-col gap-4 text-[16px] leading-relaxed">
+        <li class="border-l-2 border-cite pl-4">
+          <b class="font-semibold">근거가 없으면 내보내지 않습니다.</b>
+          <span class="text-ink-2"> 저장된 근거 목록에 없는 인용, 분석 기준일 이후의 뉴스, 보유하지 않은 종목의 뉴스를 인용하면 리포트를 만들지 않습니다.</span>
+        </li>
+        <li class="border-l-2 border-cite pl-4">
+          <b class="font-semibold">단정하는 표현을 막습니다.</b>
+          <span class="text-ink-2"> “보장”, “확실한 수익”, “무위험” 같은 표현이 들어가면 리포트를 만들지 않습니다.</span>
+        </li>
+      </ul>
+
+      <div class="mt-10">
+        <h3 class="h-sub" id="report-parts">리포트에서 읽을 수 있는 내용</h3>
+        <ol class="mt-3 grid grid-cols-2 gap-x-6 text-[15px]" aria-labelledby="report-parts">
+          {sections.map((s, i) => (
+            <li class="flex gap-3 border-t border-line py-2.5">
+              <span class="num w-4 text-ink-3">{i + 1}</span>
+              {s}
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+
+    <div class="lg:col-span-7 lg:pt-2">
+      <div class="frame" data-cite>
+        <div class="flex h-9 items-center justify-between border-b border-[#e2e8f0] bg-white px-3.5 text-[12px]">
+          <span class="font-medium text-ink-3">MyFinSight · 분석 리포트 · 포트폴리오 구성</span>
+          <span class="rounded-[4px] bg-mist px-1.5 py-0.5 font-semibold text-ink-3">예시 화면</span>
+        </div>
+        <div class="cite-body grid bg-white">
+          <article class="p-5 text-[15px] leading-[1.85] text-[#0f172a] md:p-7">
+            <p class="text-[12px] font-bold tracking-[0.06em] text-[#1d4ed8]">포트폴리오 구성</p>
+            <p class="mt-1 text-[18px] font-bold tracking-[-0.02em]">비중이 정해진 과정</p>
+            <p class="mt-3">
+              여섯 종목 모두 반도체 장비와 메모리 업황에 함께 영향을 받기 때문에, 업종이 달라 보여도 위험이
+              자동으로 나뉘지는 않습니다. 각 회사의 최근 실적 발표 공시
+              <button type="button" class="cite" aria-pressed="true" aria-controls="cite-panel" data-cite-id="1">[1]</button>
+              같은 사건은 기업별 근거에서 함께 확인할 수 있습니다.
+            </p>
+            <p class="mt-3">
+              그래서 비중은 종목별 변동성의 역수로 먼저 나누고
+              <button type="button" class="cite" aria-pressed="false" aria-controls="cite-panel" data-cite-id="2">[2]</button>,
+              한 종목이 20%를 넘지 않도록 상한을 적용했습니다. 상한에 걸린 ASML의 초과분은 나머지 종목에
+              나눠 담았습니다.
+            </p>
+          </article>
+
+          <aside id="cite-panel" class="cite-panel border-t border-[#e2e8f0] bg-[#f8fafc] p-5 md:p-6" aria-live="polite" aria-label="선택한 근거">
+            {
+              sources.map((s, i) => (
+                <div data-cite-card={s.id} hidden={i !== 0}>
+                  <p class="flex items-center gap-2 text-[12px]">
+                    <span class="num font-bold text-cite">[{s.id}]</span>
+                    <span class="pill text-[11px] text-ink-3">{s.kind}</span>
+                  </p>
+                  <p class="mt-2.5 text-[15px] font-semibold">{s.title}</p>
+                  <p class="mt-1 text-[13px] text-ink-3">{s.org}</p>
+                  <p class="num text-[13px] text-ink-3">{s.date}</p>
+                  <p class="mt-3 border-t border-[#e2e8f0] pt-3 text-[13px] leading-relaxed text-ink-2">{s.note}</p>
+                </div>
+              ))
+            }
+          </aside>
+        </div>
+      </div>
+      <p class="mt-4 text-[14px] text-ink-3">본문의 번호를 누르면 오른쪽에 그 근거가 열립니다.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cite {
+    display: inline;
+    padding: 0 2px;
+    border-radius: 3px;
+    color: var(--color-cite);
+    font-size: 0.8em;
+    font-weight: 700;
+    vertical-align: 0.25em;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 150ms ease;
+  }
+  .cite:hover,
+  .cite[aria-pressed="true"] {
+    background: var(--color-cite-50);
+  }
+  .cite {
+    position: relative;
+  }
+  /* 터치 영역을 44px 가까이로 넓힌다 (글자 크기는 그대로) */
+  .cite::before {
+    content: "";
+    position: absolute;
+    inset: -16px -14px;
+  }
+  @container (min-width: 600px) {
+    .cite-body {
+      grid-template-columns: minmax(0, 1fr) 220px;
+    }
+    .cite-panel {
+      border-top: 0;
+      border-left: 1px solid #e2e8f0;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-cite]").forEach((root) => {
+    const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-cite-id]"));
+    const cards = Array.from(root.querySelectorAll<HTMLElement>("[data-cite-card]"));
+    buttons.forEach((b) =>
+      b.addEventListener("click", () => {
+        const id = b.dataset.citeId;
+        buttons.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+        cards.forEach((c) => (c.hidden = c.dataset.citeCard !== id));
+      }),
+    );
+  });
+</script>

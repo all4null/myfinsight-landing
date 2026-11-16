@@ -1,0 +1,60 @@
+---
+/** 조건 확인 화면 재현 (앱 analysis/ConfirmScreen.tsx) */
+import { conditions } from "../../data/example";
+---
+
+<div class="scr px-4 py-5 text-[#0f172a]">
+  <p class="text-[11px] font-bold tracking-[0.08em] text-[#1d4ed8]">새 분석 · 조건 확인</p>
+  <p class="mt-1 text-[19px] leading-snug font-bold tracking-[-0.02em]">이 조건으로 분석을 시작할까요?</p>
+  <p class="mt-1.5 text-[11.5px] leading-relaxed text-[#475569]">
+    「분석 시작」을 누르기 전에는 분석이 실행되지 않으며, 아직 바꿀 수 있습니다.
+  </p>
+
+  <div class="app-card mt-3 overflow-hidden">
+    <table class="w-full border-collapse text-left text-[11.5px]">
+      <caption class="sr-only">예시 분석 조건</caption>
+      <thead class="bg-[#f8fafc] text-[#56667c]">
+        <tr>
+          <th scope="col" class="px-3 py-1.5 font-semibold">항목</th>
+          <th scope="col" class="px-3 py-1.5 font-semibold">이번 분석 값</th>
+          <th scope="col" class="cf-src px-3 py-1.5 font-semibold">출처</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          conditions.map((c) => (
+            <tr class:list={["border-t border-[#eef2f6]", c.changed && "bg-[#eff6ff]"]}>
+              <th scope="row" class="px-3 py-1.5 font-medium text-[#334155]">{c.label}</th>
+              <td class="num px-3 py-1.5 font-semibold">
+                {c.value}
+                {c.changed && <span class="ml-1.5 text-[10.5px] font-semibold text-[#1d4ed8]">변경</span>}
+              </td>
+              <td class="cf-src px-3 py-1.5 text-[#56667c]">{c.source}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-3 flex items-center justify-between gap-2" aria-hidden="true">
+    <span class="text-[11px] text-[#56667c]">시작한 뒤에는 조건을 바꿀 수 없습니다.</span>
+    <span class="shrink-0 rounded-lg bg-[#1d4ed8] px-3.5 py-1.5 text-[12px] font-semibold text-white">분석 시작</span>
+  </div>
+</div>
+
+<style>
+  .cf-src {
+    display: none;
+  }
+  @container (min-width: 440px) {
+    .cf-src {
+      display: table-cell;
+    }
+  }
+  @container (min-width: 600px) {
+    .scr {
+      padding: 26px 30px;
+    }
+  }
+</style>

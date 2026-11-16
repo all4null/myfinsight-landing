@@ -1,0 +1,235 @@
+---
+import AppFrame from "../product/AppFrame.astro";
+import IdeaScreen from "../product/IdeaScreen.astro";
+import ClarifyScreen from "../product/ClarifyScreen.astro";
+import ConfirmScreen from "../product/ConfirmScreen.astro";
+import RunScreen from "../product/RunScreen.astro";
+import ReportOverview from "../product/ReportOverview.astro";
+
+const steps = [
+  {
+    id: "idea",
+    title: "아이디어 적기",
+    body: "평소 말하듯 한두 문장이면 됩니다. 저장해 둔 투자금, 기간, 투자성향, 손실 감내 수준은 다시 묻지 않고 그대로 씁니다.",
+  },
+  {
+    id: "ask",
+    title: "질문에 답하기",
+    body: "결과가 달라지는 조건만 묻습니다. 질문은 최대 5번이고, 서로 영향이 없는 질문은 한 화면에서 함께 답합니다. 답하지 않은 항목은 기본 투자조건을 씁니다.",
+  },
+  {
+    id: "confirm",
+    title: "조건 확인",
+    body: "확정된 조건을 표로 보여 주고, 각 값이 기본 투자조건, 아이디어, 답변 중 어디에서 왔는지 표시합니다. 「분석 시작」을 눌러야 분석이 실행됩니다.",
+  },
+  {
+    id: "run",
+    title: "분석과 검증",
+    body: "종목 선정, 비중 계산, 백테스트, 투자조건 점검, 리포트 작성까지 14단계를 차례로 실행합니다. 브라우저를 닫아도 서버에서 계속 진행됩니다.",
+  },
+  {
+    id: "report",
+    title: "리포트 받기",
+    body: "과거 성과와 위험, 종목별 근거, 비중이 정해진 과정을 한 리포트에서 읽습니다. 마음에 들면 모의투자로, 아니면 조건 수정 요청으로 이어 갑니다.",
+  },
+];
+---
+
+<section id="how" class="border-t border-line bg-mist py-20 md:py-28" aria-labelledby="how-title">
+  <div class="wrap">
+    <div class="max-w-[44rem]">
+      <h2 id="how-title" class="h-section">아이디어에서 리포트까지 다섯 단계</h2>
+      <p class="lead mt-5">
+        처음 쓰는 사람도 따라갈 수 있도록, 실제 앱은 아래 순서로 진행됩니다. 단계를 고르면 그 단계의 화면을 볼
+        수 있습니다.
+      </p>
+    </div>
+
+    <div class="flow mt-12 grid gap-8 lg:grid-cols-12 lg:gap-10" data-flow>
+      <div class="lg:col-span-4" role="tablist" aria-label="이용 단계" aria-orientation="vertical" data-flow-tabs hidden>
+        {
+          steps.map((s, i) => (
+            <button
+              type="button"
+              role="tab"
+              id={`tab-${s.id}`}
+              aria-controls={`panel-${s.id}`}
+              aria-selected={i === 0 ? "true" : "false"}
+              tabindex={i === 0 ? 0 : -1}
+              class="flow-tab group relative flex w-full gap-4 border-l-2 border-line py-4 pr-2 pl-5 text-left"
+              data-step={s.id}
+            >
+              <span class="num mt-0.5 text-[14px] font-semibold text-ink-3 group-aria-selected:text-brand">{i + 1}</span>
+              <span class="min-w-0">
+                <span class="block text-[18px] font-semibold tracking-[-0.01em] text-ink-2 group-aria-selected:text-ink">
+                  {s.title}
+                </span>
+                <span class="flow-tab-body mt-1.5 hidden text-[15px] leading-relaxed text-ink-2 group-aria-selected:block">{s.body}</span>
+              </span>
+            </button>
+          ))
+        }
+      </div>
+
+      <div class="lg:col-span-8">
+        {
+          steps.map((s, i) => (
+            <div id={`panel-${s.id}`} role="tabpanel" aria-labelledby={`tab-${s.id}`} class="flow-panel" data-panel={s.id} tabindex="0">
+              <div class="flow-nojs mb-4">
+                <p class="text-[18px] font-semibold">
+                  <span class="num mr-2 text-brand">{i + 1}</span>
+                  {s.title}
+                </p>
+                <p class="mt-1 text-[15px] text-ink-2">{s.body}</p>
+              </div>
+              <AppFrame
+                title={["홈", "조건 확인", "조건 확인", "분석 진행", "분석 리포트"][i]}
+                active={i === 4 ? "reports" : "home"}
+              >
+                {s.id === "idea" && <IdeaScreen />}
+                {s.id === "ask" && <ClarifyScreen />}
+                {s.id === "confirm" && <ConfirmScreen />}
+                {s.id === "run" && <RunScreen />}
+                {s.id === "report" && <ReportOverview />}
+              </AppFrame>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .flow-panel + .flow-panel {
+    margin-top: 40px;
+  }
+  /* 스크립트가 없으면 탭 목록이 숨겨지므로 화면 열이 전체 폭을 쓴다 */
+  [data-flow]:not([data-ready]) > div:last-child {
+    grid-column: 1 / -1;
+    max-width: 880px;
+  }
+  .flow-tab[aria-selected="true"] {
+    border-left-color: var(--color-brand);
+  }
+  /* 키보드 초점: 테두리 선과 겹치지 않게 안쪽 배경과 링을 함께 보인다 */
+  .flow-tab:focus-visible {
+    outline: 2px solid var(--color-brand-600);
+    outline-offset: 2px;
+    background: color-mix(in srgb, var(--color-brand-50) 70%, transparent);
+    border-radius: 0 6px 6px 0;
+  }
+  .flow-tab:hover:not([aria-selected="true"]) {
+    border-left-color: var(--color-ink-3);
+  }
+  /* 스크립트가 탭을 켜면: 고른 화면 하나만 보이고 설명은 탭 쪽에 있다 */
+  [data-flow][data-ready] .flow-panel {
+    margin-top: 0;
+  }
+  [data-flow][data-ready] .flow-panel[hidden] {
+    display: none;
+  }
+  [data-flow][data-ready] .flow-nojs {
+    display: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-flow][data-ready] .flow-panel:not([hidden]) {
+      animation: panel-in 280ms var(--ease-out);
+    }
+  }
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-flow]");
+  const list = root?.querySelector<HTMLElement>("[data-flow-tabs]");
+  if (root && list) {
+    const tabs = Array.from(list.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+    const panels = Array.from(root.querySelectorAll<HTMLElement>('[role="tabpanel"]'));
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let runTimer: number | undefined;
+
+    const playRun = (panel: HTMLElement) => {
+      const rows = Array.from(panel.querySelectorAll<HTMLElement>("[data-run] > li"));
+      const count = panel.querySelector<HTMLElement>("[data-run-count]");
+      const title = panel.querySelector<HTMLElement>("[data-run-title]");
+      const cta = panel.querySelector<HTMLElement>("[data-run-cta]");
+      if (!rows.length || reduce.matches) return;
+      window.clearTimeout(runTimer);
+      let done = 0;
+      rows.forEach((r) => (r.dataset.state = "wait"));
+      rows.forEach((r) => (r.querySelector(".run-state")!.textContent = "대기 중"));
+      if (count) count.textContent = "0";
+      if (title) title.textContent = "분석을 실행하고 있습니다";
+      if (cta) cta.dataset.hidden = "true";
+      let i = 0;
+      const step = () => {
+        if (i > 0) {
+          const prev = rows[i - 1];
+          prev.dataset.state = "done";
+          prev.querySelector(".run-state")!.textContent = "완료";
+          done += Number(prev.dataset.detail ?? 1);
+          if (count) count.textContent = String(done);
+        }
+        if (i < rows.length) {
+          rows[i].dataset.state = "active";
+          rows[i].querySelector(".run-state")!.textContent = "진행 중";
+          i += 1;
+          runTimer = window.setTimeout(step, 650);
+        } else {
+          if (title) title.textContent = "분석이 끝났습니다";
+          if (cta) cta.dataset.hidden = "false";
+        }
+      };
+      runTimer = window.setTimeout(step, 250);
+    };
+
+    const select = (tab: HTMLButtonElement, focus = false) => {
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.setAttribute("aria-selected", String(on));
+        t.tabIndex = on ? 0 : -1;
+      });
+      panels.forEach((p) => (p.hidden = p.id !== tab.getAttribute("aria-controls")));
+      if (focus) tab.focus();
+      if (tab.dataset.step === "run") {
+        const panel = panels.find((p) => !p.hidden);
+        if (panel) playRun(panel);
+      }
+    };
+
+    list.hidden = false;
+    root.dataset.ready = "";
+    select(tabs[0]);
+
+    const wide = window.matchMedia("(min-width: 1024px)");
+    tabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => {
+        select(tab);
+        // 좁은 화면에서는 화면이 탭 목록 아래에 있으므로 고른 화면으로 내려 준다
+        if (!wide.matches) {
+          const panel = panels.find((p) => !p.hidden);
+          panel?.scrollIntoView({ behavior: reduce.matches ? "auto" : "smooth", block: "start" });
+        }
+      });
+      tab.addEventListener("keydown", (e) => {
+        const keys: Record<string, number> = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 };
+        if (e.key in keys) {
+          e.preventDefault();
+          select(tabs[(i + keys[e.key] + tabs.length) % tabs.length], true);
+        } else if (e.key === "Home") {
+          e.preventDefault();
+          select(tabs[0], true);
+        } else if (e.key === "End") {
+          e.preventDefault();
+          select(tabs[tabs.length - 1], true);
+        }
+      });
+    });
+  }
+</script>

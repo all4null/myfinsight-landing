@@ -1,0 +1,59 @@
+---
+/** 보충 질문 화면 재현 (앱 analysis/ClarifyScreen.tsx) */
+import { scenario, question } from "../../data/example";
+---
+
+<div class="scr px-4 py-5 text-[#0f172a]">
+  <p class="text-[11px] font-bold tracking-[0.08em] text-[#1d4ed8]">새 분석 · 조건 확인</p>
+  <p class="mt-1 text-[19px] leading-snug font-bold tracking-[-0.02em]">부족한 조건을 함께 정합니다</p>
+
+  <ol class="mt-3 grid grid-cols-3 gap-1.5 text-[11px]" aria-hidden="true">
+    <li class="rounded-lg border border-[#3b82f6] bg-[#eff6ff] px-2 py-1.5"><b class="block text-[#1d4ed8]">01</b>추가 질문 답하기</li>
+    <li class="rounded-lg border border-dashed border-[#cbd5e1] px-2 py-1.5 text-[#56667c]"><b class="block">02</b>조건 최종 확인</li>
+    <li class="rounded-lg border border-dashed border-[#cbd5e1] px-2 py-1.5 text-[#56667c]"><b class="block">03</b>분석 시작</li>
+  </ol>
+
+  <div class="app-card mt-3 p-3">
+    <p class="text-[12px] font-bold">투자 아이디어</p>
+    <p class="mt-1.5 border-l-2 border-[#cbd5e1] pl-2.5 text-[12px] leading-relaxed">{scenario.idea}</p>
+    <div class="mt-2 rounded-lg bg-[#f8fafc] p-2.5 text-[11.5px]">
+      <p class="font-semibold text-[#56667c]">분석 모델의 이해</p>
+      <p class="mt-0.5">{scenario.understanding}</p>
+      <p class="mt-1.5 flex flex-wrap gap-1">
+        {scenario.themes.map((t) => <span class="rounded-full border border-[#e2e8f0] bg-white px-2 py-0.5 text-[11px] font-medium">{t}</span>)}
+      </p>
+    </div>
+  </div>
+
+  <div class="app-card mt-3 p-3">
+    <p class="flex flex-wrap items-center gap-1.5 text-[11.5px]">
+      <b>{question.label}</b>
+      <span class="pill text-[10.5px] text-warn">{question.tag}</span>
+      <span class="text-[#56667c]">{question.field}</span>
+    </p>
+    <p class="mt-1.5 text-[14px] font-bold">{question.title}</p>
+    <p class="mt-1 text-[11.5px] leading-relaxed text-[#475569]">{question.why}</p>
+    <div class="mt-2.5 grid grid-cols-3 gap-1.5" aria-hidden="true">
+      {
+        question.options.map((o) => (
+          <span
+            class:list={[
+              "rounded-lg border px-2 py-1.5 text-center text-[12px] font-semibold num",
+              o === question.picked ? "border-[#1d4ed8] bg-[#eff6ff] text-[#1d4ed8]" : "border-[#e2e8f0] text-[#334155]",
+            ]}
+          >
+            {o}
+          </span>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  @container (min-width: 600px) {
+    .scr {
+      padding: 26px 30px;
+    }
+  }
+</style>

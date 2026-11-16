@@ -1,0 +1,28 @@
+---
+import GithubMark from "../GithubMark.astro";
+import { site, startCta } from "../../config/site";
+---
+
+<section class="py-24 md:py-32" aria-labelledby="cta-title">
+  <div class="wrap">
+    <div class="max-w-[48rem]">
+      <h2 id="cta-title" class="h-section">다음 투자 아이디어,<br /> 사기 전에 먼저 확인해 보세요</h2>
+      <p class="lead mt-6 max-w-[38rem]">
+        한두 문장의 아이디어와 기본 투자조건이면 시작할 수 있습니다. 분석은 「분석 시작」을 누른 뒤에만 실행됩니다.
+      </p>
+      <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+        <a href={startCta.href} class="btn btn-primary" {...startCta.external ? { rel: "noopener" } : {}}>{startCta.label}</a>
+        {
+          site.repoUrl ? (
+            <a href={site.repoUrl} rel="noopener" class="btn btn-secondary">
+              <GithubMark size={18} />
+              GitHub에서 보기
+            </a>
+          ) : (
+            <a href="#faq" class="btn btn-secondary">자주 묻는 질문 보기</a>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>

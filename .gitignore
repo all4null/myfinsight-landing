@@ -1,0 +1,21 @@
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+.vercel/
+.env
+.env.*
+!.env.example
+shots/
+.taste-skill/
+public/fonts/
+
+# 옛 Astro 빌드 산출물 (legacy-astro/ 에 소스 보관)
+dist/
+.astro/
+_local/
+
+# 내 PC 전용 (Claude Code 권한 설정, 노션 정리용 화면 캡처)
+.claude/
+notion-images/
