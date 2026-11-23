@@ -9,22 +9,27 @@ import Verify from "@/components/sections/Verify";
 import After from "@/components/sections/After";
 import Data from "@/components/sections/Data";
 import Start from "@/components/sections/Start";
+import Setup from "@/components/sections/Setup";
 import Faq from "@/components/sections/Faq";
 import FinalCta from "@/components/sections/FinalCta";
 import { site } from "@/lib/site";
+import { getRelease } from "@/lib/release";
 
-const jsonLd = {
+const ldBase = {
   "@context": "https://schema.org",
-  "@type": "WebApplication",
+  "@type": "SoftwareApplication",
   name: site.name,
   url: site.url,
   description: site.description,
   applicationCategory: "FinanceApplication",
   inLanguage: "ko",
+  operatingSystem: "Windows, macOS, Linux",
   isAccessibleForFree: true,
 };
 
-export default function Home() {
+export default async function Home() {
+  const release = await getRelease();
+  const jsonLd = { ...ldBase, softwareVersion: release.version, downloadUrl: release.allUrl };
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -39,6 +44,7 @@ export default function Home() {
         <After />
         <Data />
         <Start />
+        <Setup />
         <Faq />
         <FinalCta />
       </main>

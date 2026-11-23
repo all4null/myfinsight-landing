@@ -1,9 +1,11 @@
 import AppFrame from "../product/AppFrame";
 import ReportOverview from "../product/ReportOverview";
-import { startCta } from "@/lib/site";
+import { site, startCta } from "@/lib/site";
+import { getRelease } from "@/lib/release";
 import { metrics, pct, pctPlain } from "@/lib/example";
 
-export default function Hero() {
+export default async function Hero() {
+  const release = await getRelease();
   return (
     <section className="relative overflow-hidden pt-10 pb-16 md:pt-16 lg:pb-24" aria-labelledby="hero-title">
       <div className="wrap grid items-start gap-10 lg:grid-cols-12 lg:gap-8">
@@ -24,6 +26,11 @@ export default function Hero() {
               리포트 둘러보기
             </a>
           </div>
+          {!site.appUrl && (
+            <p className="mt-4 text-[15px] text-ink-3">
+              Windows, macOS, Linux용 {release.tag} {release.prerelease ? "시험판" : ""}
+            </p>
+          )}
           <dl className="mt-10 grid max-w-[34rem] grid-cols-2 gap-x-6 gap-y-4 border-t border-line pt-6 text-[15px]">
             <div>
               <dt className="text-ink-3">분석 대상</dt>

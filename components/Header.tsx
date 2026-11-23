@@ -76,7 +76,7 @@ export default function Header() {
             </a>
           )}
           <a href={startCta.href} className="btn btn-primary hidden min-h-[42px] px-4 text-[15px] sm:inline-flex" {...ext}>
-            {startCta.label}
+            {startCta.short}
           </a>
           <button
             ref={toggleRef}

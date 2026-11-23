@@ -23,6 +23,11 @@ export default function Footer() {
                 </a>
               </li>
             ))}
+            <li>
+              <a href="#start" className="inline-flex min-h-11 items-center text-[15px] hover:text-white">
+                다운로드
+              </a>
+            </li>
           </ul>
         </nav>
         {site.repoUrl && (
@@ -35,7 +40,9 @@ export default function Footer() {
         )}
       </div>
       <div className="border-t border-white/10">
-        <p className="wrap py-6 text-[13px] text-[#8fa3bf]">© {year} MyFinSight</p>
+        <p className="wrap py-6 text-[13px] text-[#8fa3bf]">
+          © {year} MyFinSight · Windows, Apple, Linux, Python, Docker, OpenAI 이름과 로고는 각 소유자의 상표입니다 (로고 CC0, gilbarbara/logos).
+        </p>
       </div>
     </footer>
   );

@@ -101,6 +101,9 @@ export const scenario = {
   understanding: "반도체 장비·메모리 반도체 기업에 나눠 투자하려는 요청으로 이해했습니다.",
   themes: ["반도체 장비", "메모리 반도체"],
   strategy: "역변동성비중",
+  // 앱 profile/strategyInfo.ts inverse_volatility.desc (개요 「선택한 전략」 카드의 한 줄 설명)
+  strategyShort: "주가 변동이 작은 기업일수록 더 많이, 변동이 큰 기업일수록 적게 담습니다.",
+  tradingDays: DAYS,
   asOf: "2026-10-30",
   period: "2023-10-31 ~ 2026-10-30",
   benchmark: "SPY",
@@ -117,15 +120,23 @@ export const scenario = {
   ],
 };
 
-/** 보충 질문 (앱 ClarifyScreen 의 실제 질문 형식) */
+/** 홈 「새 분석」 카드의 예시 문장 (앱 home/HomeScreen.tsx EXAMPLE_IDEAS) */
+export const exampleIdeas = [
+  "미국 반도체 기업 중 실적이 좋은 곳에 나눠 투자하고 싶어요.",
+  "배당을 꾸준히 주는 한국 대형주로 모으고 싶어요.",
+  "넷플릭스·디즈니 같은 기업에 3년 투자하고 싶어요.",
+];
+
+/** 보충 질문 (앱 home/RequestChat.tsx QuestionSays 의 형식: 질문 번호 · 최대 개수 · 관련 항목, 보기마다 바뀌는 조건) */
 export const question = {
-  label: "질문 1",
-  tag: "필수",
-  field: "관련 항목: 종목당 최대 비중",
+  meta: "질문 1 · 최대 5개 · 종목당 최대 비중",
   title: "한 종목에 최대 몇 %까지 담을까요?",
   why: "반도체 기업끼리는 함께 오르내리는 경우가 많아, 한 종목에 너무 쏠리지 않게 상한을 정합니다.",
-  options: ["15%", "20%", "25%"],
-  picked: "20%",
+  options: [
+    { label: "15%까지", patch: "종목당 최대 비중 → 15%" },
+    { label: "20%까지", patch: "종목당 최대 비중 → 20%" },
+    { label: "25%까지", patch: "종목당 최대 비중 → 25%" },
+  ],
 };
 
 /** 조건 확인 표 (앱 ConfirmScreen 의 출처 태그: 기본 투자조건 / 아이디어 / 답변·직접 변경 / 기본값 / 계산) */

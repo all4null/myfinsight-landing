@@ -1,7 +1,9 @@
 import GithubMark from "../GithubMark";
 import { site, startCta } from "@/lib/site";
+import { getRelease } from "@/lib/release";
 
-export default function FinalCta() {
+export default async function FinalCta() {
+  const release = await getRelease();
   return (
     <section className="py-24 md:py-32" aria-labelledby="cta-title">
       <div className="wrap">
@@ -11,7 +13,7 @@ export default function FinalCta() {
             <br /> 사기 전에 먼저 확인해 보세요
           </h2>
           <p className="lead mt-6 max-w-[38rem]">
-            한두 문장의 아이디어와 기본 투자조건이면 시작할 수 있습니다. 분석은 「분석 시작」을 누른 뒤에만 실행됩니다.
+            한두 문장의 아이디어와 기본 투자조건이면 시작할 수 있습니다. 분석은 조건을 확인하고 「이 조건으로 분석 실행」을 누른 뒤에만 실행됩니다.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <a href={startCta.href} className="btn btn-primary" {...(startCta.external ? { rel: "noopener" } : {})}>
@@ -28,6 +30,11 @@ export default function FinalCta() {
               </a>
             )}
           </div>
+          {!site.appUrl && (
+            <p className="mt-5 text-[15px] text-ink-3">
+              Windows, macOS, Linux용 {release.tag} {release.prerelease ? "시험판" : ""}
+            </p>
+          )}
         </div>
       </div>
     </section>

@@ -1,96 +1,116 @@
 /**
- * 설치해서 써 보기. 근거: MyFinSight/howtouse.md (3절 준비, 4절 켜기, 6절 팀 DB 없이 연습), README.md 빠른 시작,
- * Front/package.json (Node 22, pnpm). 명령은 문서에 있는 것만 쓴다.
+ * 내려받아 쓰기. 근거: MyFinSight/README.md "받아서 쓰기", packaging/RELEASE_NOTES.md (v0.1.1),
+ * packaging/source-zip/README.md (스크립트·Docker·자료 폴더), docs/updates/2026-11-23_connection_setup.md (연결 설정),
+ * Front/src/features/connect (연결 흐름: 팀 DB → 분석 모델 → 내 투자조건).
+ * 판 번호와 파일은 lib/release.ts 의 getRelease() (.env → GitHub Releases → 저장된 값) 에서 온다.
  */
-import GithubMark from "../GithubMark";
 import CopyButton from "./CopyButton";
-import { site } from "@/lib/site";
-
-const steps = [
-  { title: "저장소 받기", body: "소스 코드를 내려받고 폴더로 들어갑니다.", code: `git clone ${site.repoUrl}.git\ncd MyFinSight` },
-  {
-    title: "분석 서비스 설치",
-    body: "파이썬 가상환경을 만들고 필요한 꾸러미를 설치합니다.",
-    code: `python -m venv .venv\nsource .venv/bin/activate   # Windows: .venv\\Scripts\\Activate.ps1\npip install -e ".[analysis,dev,postgres]"`,
-  },
-  {
-    title: "설정 파일 만들기",
-    body: "예시 파일을 복사해 팀 데이터베이스 주소와 OpenAI 키를 채우고, 종목 사전을 한 번 만듭니다(팀 DB가 있을 때). 키 없이 화면 흐름만 보려면 MYFINSIGHT_LLM=stub 으로 연습 모드를 켭니다.",
-    code: `cp .env.example .env     # Windows: copy .env.example .env\npython backend/scripts/build_descriptor.py --universe ALL`,
-  },
-  { title: "화면 설치", body: "화면은 Node.js 22와 pnpm으로 설치합니다.", code: `cd Front\npnpm install\ncd ..` },
-  {
-    title: "세 프로그램 켜기",
-    body: "터미널 세 개에서 서버, 일꾼, 화면을 켜고 브라우저에서 http://localhost:5173 을 엽니다.",
-    code: `# 창 1 서버\nuvicorn backend.analysis.api.app:app --port 8001\n# 창 2 일꾼\npython -m backend.analysis.executor.worker\n# 창 3 화면\ncd Front && pnpm dev`,
-  },
-];
+import DownloadList from "./DownloadList";
+import { getRelease, otherWays } from "@/lib/release";
 
 const needs = [
-  { k: "Python", v: "3.11 이상" },
-  { k: "Node.js", v: "22, pnpm 10" },
-  { k: "데이터", v: "팀 데이터베이스 접속 정보 (없으면 연습용 가짜 데이터)" },
-  { k: "AI 응답", v: "OpenAI API 키 (없으면 미리 만든 답을 쓰는 연습 모드)" },
+  { k: "팀 DB 주소", v: "가격·재무·공시·뉴스가 쌓인 MyFinSight 데이터베이스의 접속 주소입니다. 팀에서 받습니다." },
+  { k: "OpenAI API 키", v: "아이디어 해석과 리포트 문장 작성에만 씁니다. 사용료는 키를 발급한 OpenAI 계정에 청구됩니다." },
+  { k: "둘 다 없다면", v: "예시 데이터와 미리 만든 답으로 도는 연습 모드로 처음부터 끝까지 둘러볼 수 있습니다." },
 ];
 
-export default function Start() {
+
+export default async function Start() {
+  const release = await getRelease();
+  const { executables, sourceZip } = release;
   return (
     <section id="start" className="border-t border-line bg-mist py-20 md:py-28" aria-labelledby="start-title">
       <div className="wrap grid gap-12 lg:grid-cols-12 lg:gap-10">
         <div className="lg:col-span-5">
           <h2 id="start-title" className="h-section">
-            내 컴퓨터에 설치해서 써 보기
+            내 컴퓨터에서 MyFinSight 시작하기
           </h2>
           <p className="lead mt-5">
-            MyFinSight는 소스 코드를 받아 직접 켜는 방식으로 쓸 수 있습니다. 분석 서버, 분석을 실제로 계산하는 일꾼, 브라우저
-            화면 세 가지를 켜면 처음부터 끝까지 동작합니다.
+            설치 과정 없이 파일 하나를 받아 켜면 브라우저에서 MyFinSight가 열립니다.
+            <br />
+            파이썬이나 Node.js를 따로 깔지 않아도 됩니다.
           </p>
-          {site.repoUrl && (
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a href={site.repoUrl} className="btn btn-primary" rel="noopener">
-                <GithubMark size={18} />
-                GitHub 저장소 열기
-              </a>
-            </div>
-          )}
           <h3 className="h-sub mt-12">준비할 것</h3>
           <dl className="mt-4 flex flex-col">
             {needs.map((n) => (
-              <div key={n.k} className="grid grid-cols-[6.5rem_1fr] gap-4 border-t border-line-strong py-3 text-[15px]">
+              <div key={n.k} className="grid gap-1 border-t border-line-strong py-3.5 text-[15px] sm:grid-cols-[7.5rem_1fr] sm:gap-4">
                 <dt className="font-semibold">{n.k}</dt>
-                <dd className="text-ink-2">{n.v}</dd>
+                <dd className="leading-relaxed text-ink-2">{n.v}</dd>
               </div>
             ))}
           </dl>
-          <p className="mt-6 text-[15px] leading-relaxed text-ink-2">
-            팀 데이터베이스가 없다면 저장소의 <code className="rounded bg-white px-1.5 py-0.5 text-[14px]">howtouse.md</code> 6절 ‘팀 DB
-            없이 연습해 보기’대로 가짜 데이터를 만들어 켤 수 있습니다. 실제 종목 이름만 빌린 만들어진 숫자입니다.
-          </p>
         </div>
 
-        <ol className="flex flex-col gap-5 lg:col-span-7">
-          {steps.map((s, i) => (
-            <li key={s.title} className="rounded-[14px] border border-line bg-white p-5 md:p-6">
-              <div className="flex items-baseline gap-3">
-                <span className="num text-[15px] font-semibold text-brand">{i + 1}</span>
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-[17px] font-semibold tracking-[-0.01em]">{s.title}</h3>
-                  <p className="mt-1 text-[15px] leading-relaxed text-ink-2">{s.body}</p>
-                </div>
+        <div className="lg:col-span-7">
+          <div className="dl-panel">
+            <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-line px-5 py-4 md:px-6">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <h3 className="text-[18px] font-bold tracking-[-0.01em]">MyFinSight {release.tag}</h3>
+                {release.prerelease && <span className="pill text-[12px] text-warn">시험판</span>}
+                {release.date && (
+                  <span className="text-[14px] text-ink-3">
+                    <time dateTime={release.date}>{release.dateLabel}</time> 공개
+                  </span>
+                )}
               </div>
-              <div className="code mt-4">
-                <div className="code-bar">
-                  <span className="text-[12px] text-[#9fb2cc]">터미널</span>
-                  <CopyButton text={s.code} label={`${s.title} 명령 복사`} />
-                </div>
-                <pre tabIndex={0} aria-label={`${s.title} 명령`}>
-                  <code>{s.code}</code>
-                </pre>
+              <a href={release.notesUrl} rel="noopener" className="dl-link text-[15px]">
+                이 버전에서 바뀐 점
+              </a>
+            </div>
+
+            <DownloadList items={executables} />
+
+            <div className="border-t border-line px-5 py-5 md:px-6">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                <h3 className="text-[17px] font-semibold tracking-[-0.01em]">다른 방법으로 켜기</h3>
+                <a href={sourceZip.url} rel="noopener" className="dl-link text-[15px]">
+                  source.zip 다운로드
+                </a>
               </div>
-            </li>
-          ))}
-        </ol>
+              <p className="mt-1.5 text-[15px] leading-relaxed text-ink-2">
+                두 방법 모두 <span className="dl-file">{sourceZip.name}</span> 하나를 받아 압축을 풀어 씁니다.
+              </p>
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                {otherWays.map((w) => (
+                  <div key={w.id} className="flex min-w-0 flex-col rounded-[10px] border border-line bg-mist/60 p-4">
+                    <div className="flex items-center gap-2.5">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={w.icon} alt="" loading="lazy" width={w.iconSize[0]} height={w.iconSize[1]} />
+                      <h4 className="text-[16px] font-semibold">{w.title}</h4>
+                    </div>
+                    <p className="mt-1 text-[13.5px] text-ink-3">필요한 것: {w.need}</p>
+                    <p className="mt-2 text-[14.5px] leading-relaxed text-ink-2">{w.body}</p>
+                    <div className="mt-auto pt-4">
+                      <div className="code code--wrap">
+                        <div className="code-bar">
+                          <span className="text-[12px] text-[#9fb2cc]">터미널</span>
+                          <CopyButton text={w.code} label={`${w.title} 명령 복사`} />
+                        </div>
+                        <pre tabIndex={0} aria-label={`${w.title} 명령`}>
+                          <code>{w.code}</code>
+                        </pre>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <p className="border-t border-line px-5 py-4 text-[14px] leading-relaxed text-ink-2 md:px-6">
+              압축을 풀어 쓰는 폴더형 실행 파일(조금 더 빨리 켜짐)과 지난 버전은{" "}
+              <a href={release.allUrl} rel="noopener" className="dl-link">
+                Releases 페이지
+              </a>
+              에, 켜는 법과 문제 해결은{" "}
+              <a href={release.guideUrl} rel="noopener" className="dl-link">
+                배포판 안내
+              </a>
+              에 있습니다.
+            </p>
+          </div>
+        </div>
       </div>
+
     </section>
   );
 }

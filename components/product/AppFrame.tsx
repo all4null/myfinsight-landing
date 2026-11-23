@@ -1,7 +1,9 @@
+import Glyph from "./Glyph";
+
 /**
  * 앱 창 재현 프레임.
  * - 위 막대: 화면 이름 + "예시 화면" 표시 (실제 결과와 헷갈리지 않게 항상 보인다).
- * - 사이드바: 앱 사이드바(홈 · 새 분석 / 분석 리포트 / 모의투자 / 내 투자조건). 프레임이 넓을 때만 보인다.
+ * - 사이드바: 앱 사이드바(홈 · 새 분석 / 분석 리포트 / 모의투자 / 내 투자조건, 아래쪽에 연결 설정). 프레임이 넓을 때만 보인다.
  */
 type Active = "home" | "reports" | "paper" | "profile";
 
@@ -66,6 +68,10 @@ export default function AppFrame({
                 {m.label}
               </span>
             ))}
+            <span className="mt-auto flex items-center gap-2 rounded-lg px-2.5 py-2 text-[12.5px] text-[#334155]">
+              <Glyph name="settings" size={14} />
+              연결 설정
+            </span>
           </div>
         )}
         <div className="app-body-main min-w-0 flex-1">{children}</div>
