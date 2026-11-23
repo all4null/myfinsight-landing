@@ -37,9 +37,22 @@ npm run typecheck # 타입 검사만
 
 MyFinSight 는 공개 웹 주소 없이 내 컴퓨터에서 켜는 프로그램이라(GitHub Releases 의 실행 파일, 켜면 `localhost:8765`) `NEXT_PUBLIC_APP_URL` 을 비워 두었습니다. 도메인이 정해지면 `.env`의 `SITE_URL`만 바꾸면 됩니다. sitemap.xml과 robots.txt(`app/robots.ts`)가 이 값을 따라갑니다.
 
-## Vercel 배포
+## Vercel 배포 (GitHub Actions)
 
-프레임워크 프리셋 Next.js, 빌드 명령 `npm run build`. 정적 내보내기이므로 출력 폴더는 `out` 입니다. 위 환경변수를 프로젝트 설정에 넣습니다. (이 저장소에서는 배포하지 않았습니다.)
+Vercel 의 GitHub 연동은 쓰지 않습니다. `.github/workflows/deploy.yml` 이 빌드하고 Vercel 에 올립니다. `vercel.json` 의 `git.deploymentEnabled: false` 는 저장소가 Vercel 에 연결되더라도 Vercel 이 따로 배포하지 않게 막습니다 (두 번 배포 방지).
+
+**언제 배포되나**: `main` 에 푸시할 때, 매일 09:00(한국 시간), Actions 탭에서 손으로 실행할 때. 매일 다시 빌드하는 것은 새 MyFinSight 판(GitHub Releases)을 반영하기 위해서입니다.
+
+**처음 한 번 할 일**
+
+1. Vercel 가입 (GitHub 계정으로 로그인해도 됩니다. 저장소를 import 하지는 않습니다).
+2. 이 폴더에서 `npx vercel login` → `npx vercel link`. 새 프로젝트를 만들면 `.vercel/project.json` 에 `orgId`, `projectId` 가 생깁니다 (`.vercel/` 은 git 에 올리지 않습니다).
+3. Vercel → Account Settings → Tokens 에서 토큰 발급.
+4. GitHub 저장소 → Settings → Secrets and variables → Actions 에 `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` 추가.
+5. Vercel 프로젝트 → Settings → Environment Variables (Production) 에 `SITE_URL` 을 배포 주소로. 다른 값(`RELEASE_*` 등)은 필요할 때만.
+6. `main` 에 푸시하거나 Actions 탭에서 "Deploy to Vercel" 실행.
+
+워크플로는 빌드할 때 Actions 의 `GITHUB_TOKEN` 을 넘겨 GitHub Releases 조회 한도(로그인 없이 시간당 60번)를 피합니다. 로컬 빌드에서는 없어도 됩니다.
 
 ## 내려받기 버전 바꾸기
 

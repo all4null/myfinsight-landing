@@ -1,0 +1,53 @@
+# Vercel 배포. Vercel 의 GitHub 연동 대신 이 워크플로가 빌드하고 올린다 (vercel.json 에서 Git 배포를 꺼 두었다).
+# 필요한 저장소 Secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID (README "Vercel 배포").
+# 사이트 환경변수(SITE_URL, RELEASE_* 등)는 Vercel 프로젝트 설정에 두고, vercel pull 이 받아 온다.
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+  # 내려받기 버전은 빌드할 때 GitHub Releases 에서 읽는다. 매일 다시 빌드해 새 MyFinSight 판을 반영한다.
+  schedule:
+    - cron: "0 0 * * *" # 매일 09:00 (한국 시간)
+  workflow_dispatch: # Actions 탭에서 손으로 실행
+
+# 같은 배포가 겹치면 앞의 것을 멈추고 마지막 것만 올린다
+concurrency:
+  group: vercel-production
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 의존성 설치
+        run: npm ci
+
+      - name: 타입 검사
+        run: npm run typecheck
+
+      - name: Vercel 설정·환경변수 받기
+        run: npx --yes vercel@latest pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: 빌드
+        run: npx --yes vercel@latest build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          # 버전 조회(lib/release.ts)를 로그인한 요청으로: 조회 한도가 시간당 60번에서 크게 늘어난다
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 배포
+        run: npx --yes vercel@latest deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

@@ -7,6 +7,7 @@
  *   RELEASE_PRERELEASE  true/false. 비우면 GitHub 의 시험판 표시를 따른다.
  *   RELEASE_NOTES_URL   「이 버전에서 바뀐 점」 링크. 비우면 그 판의 Releases 페이지.
  *   RELEASE_GUIDE_URL   「배포판 안내」 링크. 비우면 그 판의 packaging/source-zip/README.md.
+ *   GITHUB_TOKEN        (선택) 있으면 로그인한 요청으로 조회한다. GitHub Actions 배포에서 넘긴다.
  * GitHub 에 닿지 못하면(오프라인 빌드) FALLBACK 을 쓰고, 버전이 FALLBACK 과 다르면 파일 크기는 표시하지 않는다.
  * 시험판은 GitHub 의 /releases/latest 에 잡히지 않으므로, 내려받기 링크는 늘 태그를 넣은 주소로 만든다.
  */
@@ -99,9 +100,11 @@ async function fromGitHub(tag: string | null): Promise<GitHubRelease | null> {
   const m = site.repoUrl.match(/github\.com\/([^/]+)\/([^/#?]+)/);
   if (!m) return null;
   const api = `https://api.github.com/repos/${m[1]}/${m[2].replace(/\.git$/, "")}/releases`;
+  // 토큰이 있으면(GitHub Actions 의 GITHUB_TOKEN 등) 로그인한 요청으로: 조회 한도가 시간당 60번에서 크게 늘어난다
+  const token = env("GITHUB_TOKEN");
   try {
     const res = await fetch(tag ? `${api}/tags/${tag}` : `${api}?per_page=1`, {
-      headers: { Accept: "application/vnd.github+json" },
+      headers: { Accept: "application/vnd.github+json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       // 정적 내보내기: 빌드할 때 한 번 받아 HTML 에 굳힌다
       cache: "force-cache",
       signal: AbortSignal.timeout(8000),
