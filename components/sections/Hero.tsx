@@ -1,5 +1,6 @@
 import AppFrame from "../product/AppFrame";
 import ReportOverview from "../product/ReportOverview";
+import NotionLink from "../NotionLink";
 import { site, startCta } from "@/lib/site";
 import { getRelease } from "@/lib/release";
 import { metrics, pct, pctPlain } from "@/lib/example";
@@ -31,6 +32,7 @@ export default async function Hero() {
               Windows, macOS, Linux용 {release.tag} {release.prerelease ? "시험판" : ""}
             </p>
           )}
+          <NotionLink className="mt-4" />
           <dl className="mt-10 grid max-w-[34rem] grid-cols-2 gap-x-6 gap-y-4 border-t border-line pt-6 text-[15px]">
             <div>
               <dt className="text-ink-3">분석 대상</dt>

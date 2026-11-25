@@ -1,5 +1,6 @@
 import GithubMark from "../GithubMark";
 import QrCode from "../QrCode";
+import NotionLink from "../NotionLink";
 import { site, startCta } from "@/lib/site";
 import { getRelease } from "@/lib/release";
 
@@ -40,6 +41,7 @@ export default async function FinalCta() {
               Windows, macOS, Linux용 {release.tag} {release.prerelease ? "시험판" : ""}
             </p>
           )}
+          <NotionLink className="mt-4" />
         </div>
 
         {/* 발표 화면이나 부스 모니터에 띄웠을 때 휴대폰으로 가져가는 용도. 휴대폰 화면에서는 찍을 수 없으니 넓은 화면에서만 */}
